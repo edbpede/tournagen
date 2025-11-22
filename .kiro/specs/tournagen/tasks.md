@@ -129,7 +129,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Update seeding on reorder
     - _Requirements: 3.4_
   
-  - [ ] 7.5 Add optional fields support
+  - [x] 7.5 Add optional fields support
     - Add inputs for seed, team, nationality, metadata
     - Store in participant object
     - _Requirements: 3.5_

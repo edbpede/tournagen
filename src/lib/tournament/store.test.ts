@@ -181,6 +181,49 @@ describe("tournament store", () => {
     expect(tournamentState.isDirty).toBe(true);
     expect(
       (tournamentState.currentConfig?.updatedAt.getTime() ?? 0) >
+      initialUpdatedAt.getTime(),
+    ).toBe(true);
+  });
+
+  it("stores optional participant fields when provided", () => {
+    resetState();
+    const initialUpdatedAt = new Date(0);
+
+    setTournamentState({
+      currentConfig: {
+        id: "cfg",
+        name: "Test Config",
+        formatType: TournamentFormatType.SingleElimination,
+        participants: [],
+        createdAt: new Date(0),
+        updatedAt: initialUpdatedAt,
+      },
+      currentStructure: { type: "bracket", rounds: [] },
+      step: "participants",
+      isDirty: false,
+    });
+
+    const metadata = { role: "captain", notes: "Prefers mornings" };
+
+    const created = addParticipant({
+      name: "Delta",
+      seed: 7,
+      team: "Falcons",
+      nationality: "Canada",
+      metadata,
+    });
+
+    expect(created?.seed).toBe(7);
+    expect(created?.team).toBe("Falcons");
+    expect(created?.nationality).toBe("Canada");
+    expect(created?.metadata).toBe(metadata);
+    expect(tournamentState.currentStructure === null).toBe(true);
+    expect(tournamentState.currentConfig?.participants[0].metadata).toBe(
+      metadata,
+    );
+    expect(tournamentState.isDirty).toBe(true);
+    expect(
+      (tournamentState.currentConfig?.updatedAt.getTime() ?? 0) >
         initialUpdatedAt.getTime(),
     ).toBe(true);
   });

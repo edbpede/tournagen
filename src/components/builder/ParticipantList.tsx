@@ -18,6 +18,18 @@ interface ParticipantListItemProps {
 const ParticipantListItem: Component<ParticipantListItemProps> = (props) => {
   const [isEditing, setIsEditing] = createSignal(false);
   const [draftName, setDraftName] = createSignal(props.participant.name);
+  const [draftSeed, setDraftSeed] = createSignal(
+    props.participant.seed ? String(props.participant.seed) : "",
+  );
+  const [draftTeam, setDraftTeam] = createSignal(props.participant.team ?? "");
+  const [draftNationality, setDraftNationality] = createSignal(
+    props.participant.nationality ?? "",
+  );
+  const [draftMetadata, setDraftMetadata] = createSignal(
+    props.participant.metadata
+      ? JSON.stringify(props.participant.metadata)
+      : "",
+  );
   const [error, setError] = createSignal<string | null>(null);
 
   const displaySeed = createMemo(() => props.participant.seed ?? props.index + 1);
@@ -53,11 +65,25 @@ const ParticipantListItem: Component<ParticipantListItemProps> = (props) => {
   createEffect(() => {
     if (!isEditing()) {
       setDraftName(props.participant.name);
+      setDraftSeed(props.participant.seed ? String(props.participant.seed) : "");
+      setDraftTeam(props.participant.team ?? "");
+      setDraftNationality(props.participant.nationality ?? "");
+      setDraftMetadata(
+        props.participant.metadata
+          ? JSON.stringify(props.participant.metadata)
+          : "",
+      );
     }
   });
 
   const handleStartEdit = () => {
     setDraftName(props.participant.name);
+    setDraftSeed(props.participant.seed ? String(props.participant.seed) : "");
+    setDraftTeam(props.participant.team ?? "");
+    setDraftNationality(props.participant.nationality ?? "");
+    setDraftMetadata(
+      props.participant.metadata ? JSON.stringify(props.participant.metadata) : "",
+    );
     setError(null);
     setIsEditing(true);
   };
@@ -70,7 +96,46 @@ const ParticipantListItem: Component<ParticipantListItemProps> = (props) => {
       return;
     }
 
-    updateParticipant(props.participant.id, { name: trimmed });
+    const updates: Partial<Participant> = { name: trimmed };
+
+    const seedValue = draftSeed().trim();
+    if (seedValue.length > 0) {
+      const numericSeed = Number(seedValue);
+      if (!Number.isInteger(numericSeed) || numericSeed <= 0) {
+        setError("Seed must be a positive integer");
+        return;
+      }
+      updates.seed = numericSeed;
+    } else {
+      updates.seed = undefined;
+    }
+
+    const teamValue = draftTeam().trim();
+    updates.team = teamValue.length > 0 ? teamValue : undefined;
+
+    const nationalityValue = draftNationality().trim();
+    updates.nationality =
+      nationalityValue.length > 0 ? nationalityValue : undefined;
+
+    const metadataValue = draftMetadata().trim();
+
+    if (metadataValue.length > 0) {
+      try {
+        const parsed = JSON.parse(metadataValue);
+        if (!parsed || Array.isArray(parsed) || typeof parsed !== "object") {
+          setError("Metadata must be a JSON object");
+          return;
+        }
+        updates.metadata = parsed as Record<string, unknown>;
+      } catch {
+        setError("Metadata must be valid JSON");
+        return;
+      }
+    } else {
+      updates.metadata = undefined;
+    }
+
+    updateParticipant(props.participant.id, updates);
     setIsEditing(false);
     setError(null);
   };
@@ -137,6 +202,56 @@ const ParticipantListItem: Component<ParticipantListItemProps> = (props) => {
                 {message()}
               </p>
             )}
+          </Show>
+          <Show when={isEditing()}>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label class="space-y-1 text-sm text-neutral-800">
+                <span class="font-semibold text-neutral-700">Seed</span>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min="1"
+                  class="input w-full"
+                  value={draftSeed()}
+                  onInput={(event) => setDraftSeed(event.currentTarget.value)}
+                  aria-label={`Seed for ${props.participant.name}`}
+                />
+              </label>
+              <label class="space-y-1 text-sm text-neutral-800">
+                <span class="font-semibold text-neutral-700">Team</span>
+                <input
+                  type="text"
+                  class="input w-full"
+                  value={draftTeam()}
+                  onInput={(event) => setDraftTeam(event.currentTarget.value)}
+                  aria-label={`Team for ${props.participant.name}`}
+                />
+              </label>
+              <label class="space-y-1 text-sm text-neutral-800">
+                <span class="font-semibold text-neutral-700">Nationality</span>
+                <input
+                  type="text"
+                  class="input w-full"
+                  value={draftNationality()}
+                  onInput={(event) =>
+                    setDraftNationality(event.currentTarget.value)
+                  }
+                  aria-label={`Nationality for ${props.participant.name}`}
+                />
+              </label>
+              <label class="space-y-1 text-sm text-neutral-800 sm:col-span-2">
+                <span class="font-semibold text-neutral-700">Metadata (JSON)</span>
+                <textarea
+                  class="input w-full min-h-[88px]"
+                  value={draftMetadata()}
+                  onInput={(event) => setDraftMetadata(event.currentTarget.value)}
+                  aria-label={`Metadata for ${props.participant.name}`}
+                />
+                <span class="text-xs text-neutral-600">
+                  Store format-specific attributes as a JSON object. Leave blank to clear.
+                </span>
+              </label>
+            </div>
           </Show>
           <Show when={optionalBadges().length > 0}>
             <div class="flex flex-wrap gap-2">
