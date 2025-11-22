@@ -13,7 +13,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
   - Set up color palette, typography scale, and spacing system
   - _Requirements: 18.1, 18.3, 14.1, 14.2, 14.3_
 
-- [ ] 2. Implement core type system and interfaces
+- [x] 2. Implement core type system and interfaces
   - [x] 2.1 Create base tournament types and discriminated unions
     - Define `Participant`, `BaseTournamentConfig`, and `TournamentConfig` discriminated union
     - Define `TournamentFormatType` enum
@@ -26,7 +26,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Create type-safe component prop interfaces
     - _Requirements: 17.2, 17.3_
   
-  - [ ] 2.3 Implement format registry
+  - [x] 2.3 Implement format registry
     - Create `TournamentFormatRegistry` class with register/get/getAll methods
     - Export global registry instance
     - _Requirements: 17.1, 17.5_
