@@ -12,6 +12,7 @@ import type {
 } from "../types";
 import { TournamentFormatType } from "../types";
 import { createDefaultSingleEliminationConfig } from "./single-elimination/config";
+import { generateSingleEliminationBracket } from "./single-elimination/generator";
 
 type BaseConfigFor<T extends TournamentFormatType> = BaseTournamentConfig & {
   formatType: T;
@@ -83,7 +84,7 @@ const singleEliminationFormat: TournamentFormat<
   createDefaultConfig: (participants) =>
     createDefaultSingleEliminationConfig(participants),
   validateConfig: () => ({ valid: true }),
-  generateStructure: () => createDefaultStructure(),
+  generateStructure: (config) => generateSingleEliminationBracket(config),
   ConfigPanel: createPlaceholderConfigPanel<SingleEliminationConfig>(),
   Visualizer: createPlaceholderVisualizer<SingleEliminationConfig>(),
 };

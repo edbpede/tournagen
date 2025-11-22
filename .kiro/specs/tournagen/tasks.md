@@ -147,7 +147,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Define `SingleEliminationOptions` interface
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
   
-  - [ ] 8.2 Implement bracket generation algorithm
+  - [x] 8.2 Implement bracket generation algorithm
     - Create `generateSingleEliminationBracket` function
     - Calculate round count based on participant count
     - Generate first round with byes
