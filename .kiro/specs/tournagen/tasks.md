@@ -69,7 +69,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Ensure human-readable JSON structure
     - _Requirements: 5.1, 5.4_
   
-  - [ ] 5.2 Create import utility
+  - [x] 5.2 Create import utility
     - Implement `importTournament` function that parses and validates JSON
     - Return discriminated union for success/error
     - Handle invalid JSON, schema errors, and missing formats
