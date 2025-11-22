@@ -112,7 +112,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Apply fine-grained reactivity for individual updates
     - _Requirements: 3.1, 3.2, 18.2_
   
-  - [ ] 7.2 Implement add participant functionality
+  - [x] 7.2 Implement add participant functionality
     - Create input form with validation
     - Call state update function on submit
     - Clear input after successful add

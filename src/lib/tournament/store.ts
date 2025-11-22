@@ -51,6 +51,37 @@ export const hasGeneratedStructure = createMemo(
   () => tournamentState.currentStructure !== null,
 );
 
+export function addParticipant(participant: Omit<Participant, "id">): Participant | null {
+  if (!tournamentState.currentConfig) {
+    return null;
+  }
+
+  const trimmedName = participant.name.trim();
+
+  if (trimmedName.length === 0) {
+    return null;
+  }
+
+  const timestamp = new Date();
+  const newParticipant: Participant = {
+    ...participant,
+    id: crypto.randomUUID(),
+    name: trimmedName,
+  };
+
+  batch(() => {
+    setTournamentState("currentConfig", "participants", (participants) => [
+      ...participants,
+      newParticipant,
+    ]);
+    setTournamentState("currentConfig", "updatedAt", timestamp);
+    setTournamentState("currentStructure", null);
+    setTournamentState("isDirty", true);
+  });
+
+  return newParticipant;
+}
+
 export function setCurrentFormat(
   formatType: TournamentFormatType,
   participants: readonly Participant[] = tournamentState.currentConfig?.participants ?? [],

@@ -17,6 +17,7 @@ import {
   setCurrentStep,
   setTournamentState,
   tournamentState,
+  addParticipant,
   updateMultipleParticipants,
   updateParticipant,
 } from "./store";
@@ -141,6 +142,38 @@ describe("tournament store", () => {
     expect(tournamentState.currentConfig?.participants[0].id).toBe("p1");
     expect(tournamentState.currentConfig?.participants[0].name).toBe("Updated");
     expect(tournamentState.currentConfig?.participants[0].seed).toBe(2);
+    expect(tournamentState.currentConfig?.participants[1].name).toBe("Bravo");
+    expect(tournamentState.currentStructure === null).toBe(true);
+    expect(tournamentState.isDirty).toBe(true);
+    expect(
+      (tournamentState.currentConfig?.updatedAt.getTime() ?? 0) >
+        initialUpdatedAt.getTime(),
+    ).toBe(true);
+  });
+
+  it("adds a participant and marks the config dirty", () => {
+    resetState();
+    const initialUpdatedAt = new Date(0);
+
+    setTournamentState({
+      currentConfig: {
+        id: "cfg",
+        name: "Test Config",
+        formatType: TournamentFormatType.SingleElimination,
+        participants: [{ id: "p1", name: "Alpha" }],
+        createdAt: new Date(0),
+        updatedAt: initialUpdatedAt,
+      },
+      currentStructure: { type: "bracket", rounds: [] },
+      step: "participants",
+      isDirty: false,
+    });
+
+    const created = addParticipant({ name: "   Bravo  " });
+
+    expect(created?.name).toBe("Bravo");
+    expect(created?.id).toBeDefined();
+    expect(tournamentState.currentConfig?.participants.length).toBe(2);
     expect(tournamentState.currentConfig?.participants[1].name).toBe("Bravo");
     expect(tournamentState.currentStructure === null).toBe(true);
     expect(tournamentState.isDirty).toBe(true);

@@ -1,6 +1,7 @@
 import { Show } from "solid-js";
 import type { Component } from "solid-js";
 import ParticipantList from "./ParticipantList";
+import AddParticipantForm from "./AddParticipantForm";
 import { currentFormat } from "@/lib/tournament/store";
 
 const ParticipantManager: Component = () => {
@@ -32,7 +33,10 @@ const ParticipantManager: Component = () => {
           </div>
         }
       >
-        <ParticipantList />
+        <div class="space-y-4">
+          <AddParticipantForm />
+          <ParticipantList />
+        </div>
       </Show>
     </div>
   );
