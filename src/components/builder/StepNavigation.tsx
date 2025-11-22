@@ -1,51 +1,23 @@
 import { createMemo } from "solid-js";
 import type { Component } from "solid-js";
 import {
-  builderSteps,
-  findStepIndex,
-  getNextStep,
-  getPreviousStep,
-} from "@/lib/tournament/builder-steps";
-import { setCurrentStep, tournamentState } from "@/lib/tournament/store";
+  getStepNavigationSnapshot,
+  goToNextStep,
+  goToPreviousStep,
+} from "@/lib/tournament/navigation";
+import { tournamentState } from "@/lib/tournament/store";
 
 const StepNavigation: Component = () => {
-  const currentIndex = createMemo(() => findStepIndex(tournamentState.step));
-  const currentStep = createMemo(
-    () => builderSteps[currentIndex()] ?? builderSteps[0],
+  const navigation = createMemo(() =>
+    getStepNavigationSnapshot(tournamentState.step),
   );
-  const previousStep = createMemo(() => getPreviousStep(tournamentState.step));
-  const previousStepTitle = createMemo(() => {
-    const prev = previousStep();
-    if (!prev) {
-      return null;
-    }
-    const index = findStepIndex(prev);
-    return builderSteps[index]?.title ?? prev;
-  });
-  const nextStep = createMemo(() => getNextStep(tournamentState.step));
-  const nextStepTitle = createMemo(() => {
-    const next = nextStep();
-    if (!next) {
-      return null;
-    }
-    const index = findStepIndex(next);
-    return builderSteps[index]?.title ?? next;
-  });
 
   const handleBack = () => {
-    const targetStep = previousStep();
-    if (!targetStep) {
-      return;
-    }
-    setCurrentStep(targetStep);
+    goToPreviousStep();
   };
 
   const handleNext = () => {
-    const targetStep = nextStep();
-    if (!targetStep) {
-      return;
-    }
-    setCurrentStep(targetStep);
+    goToNextStep();
   };
 
   return (
@@ -64,7 +36,8 @@ const StepNavigation: Component = () => {
             guided builder flow.
           </p>
           <p class="text-sm font-semibold text-neutral-900">
-            {currentStep().title} · Step {currentIndex() + 1} of {builderSteps.length}
+            {navigation().currentTitle} · Step {navigation().currentIndex + 1} of{" "}
+            {navigation().totalSteps}
           </p>
         </div>
 
@@ -73,10 +46,10 @@ const StepNavigation: Component = () => {
             type="button"
             class="btn-secondary px-4 py-2"
             onClick={handleBack}
-            disabled={!previousStep()}
+            disabled={!navigation().previous}
             aria-label={
-              previousStepTitle()
-                ? `Go back to ${previousStepTitle()}`
+              navigation().previousTitle
+                ? `Go back to ${navigation().previousTitle}`
                 : "Back is disabled on the first step"
             }
           >
@@ -86,15 +59,15 @@ const StepNavigation: Component = () => {
             type="button"
             class="btn-primary px-4 py-2"
             onClick={handleNext}
-            disabled={!nextStep()}
+            disabled={!navigation().next}
             aria-label={
-              nextStepTitle()
-                ? `Go forward to ${nextStepTitle()}`
+              navigation().nextTitle
+                ? `Go forward to ${navigation().nextTitle}`
                 : "Next is disabled on the final step"
             }
           >
-            {nextStepTitle()
-              ? `Next: ${nextStepTitle()}`
+            {navigation().nextTitle
+              ? `Next: ${navigation().nextTitle}`
               : "You're on the final step"}
           </button>
         </div>
