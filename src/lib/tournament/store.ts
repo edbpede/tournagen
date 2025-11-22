@@ -184,3 +184,33 @@ export function updateMultipleParticipants(
     setTournamentState("isDirty", true);
   });
 }
+
+export function removeParticipant(participantId: string): void {
+  if (!tournamentState.currentConfig) {
+    return;
+  }
+
+  let removed = false;
+
+  setTournamentState("currentConfig", "participants", (participants) =>
+    participants.filter((participant) => {
+      if (participant.id === participantId) {
+        removed = true;
+        return false;
+      }
+      return true;
+    }),
+  );
+
+  if (!removed) {
+    return;
+  }
+
+  const timestamp = new Date();
+
+  batch(() => {
+    setTournamentState("currentConfig", "updatedAt", timestamp);
+    setTournamentState("currentStructure", null);
+    setTournamentState("isDirty", true);
+  });
+}

@@ -1,6 +1,10 @@
-import { For, Show, createMemo } from "solid-js";
+import { For, Show, createEffect, createMemo, createSignal } from "solid-js";
 import type { Component } from "solid-js";
-import { currentParticipants } from "@/lib/tournament/store";
+import {
+  currentParticipants,
+  removeParticipant,
+  updateParticipant,
+} from "@/lib/tournament/store";
 import type { Participant } from "@/lib/tournament/types";
 
 interface ParticipantListItemProps {
@@ -9,6 +13,10 @@ interface ParticipantListItemProps {
 }
 
 const ParticipantListItem: Component<ParticipantListItemProps> = (props) => {
+  const [isEditing, setIsEditing] = createSignal(false);
+  const [draftName, setDraftName] = createSignal(props.participant.name);
+  const [error, setError] = createSignal<string | null>(null);
+
   const displaySeed = createMemo(() => props.participant.seed ?? props.index + 1);
 
   const optionalBadges = createMemo(() => {
@@ -39,6 +47,49 @@ const ParticipantListItem: Component<ParticipantListItemProps> = (props) => {
     return badges;
   });
 
+  createEffect(() => {
+    if (!isEditing()) {
+      setDraftName(props.participant.name);
+    }
+  });
+
+  const handleStartEdit = () => {
+    setDraftName(props.participant.name);
+    setError(null);
+    setIsEditing(true);
+  };
+
+  const handleSave = () => {
+    const trimmed = draftName().trim();
+
+    if (trimmed.length === 0) {
+      setError("Name cannot be empty");
+      return;
+    }
+
+    updateParticipant(props.participant.id, { name: trimmed });
+    setIsEditing(false);
+    setError(null);
+  };
+
+  const handleCancel = () => {
+    setDraftName(props.participant.name);
+    setIsEditing(false);
+    setError(null);
+  };
+
+  const handleRemove = () => {
+    const message = `Remove ${props.participant.name}? This will also refresh the current bracket.`;
+    const confirmed =
+      typeof window !== "undefined" ? window.confirm(message) : true;
+
+    if (!confirmed) {
+      return;
+    }
+
+    removeParticipant(props.participant.id);
+  };
+
   return (
     <article
       class="flex items-start justify-between gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-3 shadow-soft"
@@ -49,7 +100,33 @@ const ParticipantListItem: Component<ParticipantListItemProps> = (props) => {
           {displaySeed()}
         </span>
         <div class="space-y-1">
-          <p class="font-semibold text-neutral-900">{props.participant.name}</p>
+          <Show
+            when={isEditing()}
+            fallback={
+              <p class="font-semibold text-neutral-900">
+                {props.participant.name}
+              </p>
+            }
+          >
+            <label class="flex flex-col gap-2 text-sm text-neutral-900 sm:flex-row sm:items-center">
+              <span class="font-semibold text-neutral-700">Editing name</span>
+              <input
+                type="text"
+                class="input w-full sm:w-64"
+                value={draftName()}
+                onInput={(event) => setDraftName(event.currentTarget.value)}
+                aria-label={`Edit name for ${props.participant.name}`}
+                aria-invalid={error() ? "true" : "false"}
+              />
+            </label>
+          </Show>
+          <Show when={error()}>
+            {(message) => (
+              <p class="text-xs font-semibold text-danger" role="alert">
+                {message()}
+              </p>
+            )}
+          </Show>
           <Show when={optionalBadges().length > 0}>
             <div class="flex flex-wrap gap-2">
               <For each={optionalBadges()}>
@@ -64,9 +141,51 @@ const ParticipantListItem: Component<ParticipantListItemProps> = (props) => {
           </Show>
         </div>
       </div>
-      <span class="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-semibold text-neutral-700">
-        #{props.index + 1}
-      </span>
+      <div class="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+        <span class="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-semibold text-neutral-700">
+          #{props.index + 1}
+        </span>
+        <div class="flex items-center gap-2">
+          <Show
+            when={isEditing()}
+            fallback={
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onClick={handleStartEdit}
+                aria-label={`Edit ${props.participant.name}`}
+              >
+                Edit name
+              </button>
+            }
+          >
+            <button
+              type="button"
+              class="btn btn-primary"
+              onClick={handleSave}
+              aria-label={`Save name for ${props.participant.name}`}
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              class="btn btn-ghost"
+              onClick={handleCancel}
+              aria-label={`Cancel editing ${props.participant.name}`}
+            >
+              Cancel
+            </button>
+          </Show>
+          <button
+            type="button"
+            class="btn btn-ghost text-danger"
+            onClick={handleRemove}
+            aria-label={`Remove ${props.participant.name}`}
+          >
+            Remove
+          </button>
+        </div>
+      </div>
     </article>
   );
 };

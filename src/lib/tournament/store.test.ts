@@ -20,6 +20,7 @@ import {
   addParticipant,
   updateMultipleParticipants,
   updateParticipant,
+  removeParticipant,
 } from "./store";
 import { tournamentFormatRegistry } from "./registry";
 
@@ -175,6 +176,39 @@ describe("tournament store", () => {
     expect(created?.id).toBeDefined();
     expect(tournamentState.currentConfig?.participants.length).toBe(2);
     expect(tournamentState.currentConfig?.participants[1].name).toBe("Bravo");
+    expect(tournamentState.currentStructure === null).toBe(true);
+    expect(tournamentState.isDirty).toBe(true);
+    expect(
+      (tournamentState.currentConfig?.updatedAt.getTime() ?? 0) >
+        initialUpdatedAt.getTime(),
+    ).toBe(true);
+  });
+
+  it("removes a participant, marks dirty, and resets the structure", () => {
+    resetState();
+    const initialUpdatedAt = new Date(0);
+
+    setTournamentState({
+      currentConfig: {
+        id: "cfg",
+        name: "Test Config",
+        formatType: TournamentFormatType.SingleElimination,
+        participants: [
+          { id: "p1", name: "Alpha" },
+          { id: "p2", name: "Bravo" },
+        ],
+        createdAt: new Date(0),
+        updatedAt: initialUpdatedAt,
+      },
+      currentStructure: { type: "bracket", rounds: [] },
+      step: "participants",
+      isDirty: false,
+    });
+
+    removeParticipant("p1");
+
+    expect(tournamentState.currentConfig?.participants.length).toBe(1);
+    expect(tournamentState.currentConfig?.participants[0].id).toBe("p2");
     expect(tournamentState.currentStructure === null).toBe(true);
     expect(tournamentState.isDirty).toBe(true);
     expect(

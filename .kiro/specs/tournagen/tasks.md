@@ -118,7 +118,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Clear input after successful add
     - _Requirements: 3.1_
   
-  - [ ] 7.3 Implement edit and remove functionality
+  - [x] 7.3 Implement edit and remove functionality
     - Add inline edit for participant names
     - Add remove button with confirmation
     - Update tournament structure on changes
