@@ -62,7 +62,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Add responsive layout with breakpoints
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 17.5_
 
-- [ ] 5. Implement import/export functionality
+- [x] 5. Implement import/export functionality
   - [x] 5.1 Create export utility
     - Implement `exportTournament` function that serializes config to JSON
     - Trigger browser download with proper filename
@@ -75,13 +75,13 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Handle invalid JSON, schema errors, and missing formats
     - _Requirements: 5.2, 5.3_
   
-- [ ] 5.3 Implement local storage persistence
+  - [x] 5.3 Implement local storage persistence
     - Create `saveToLocalStorage` and `loadFromLocalStorage` functions
     - Validate data from local storage before loading
     - Handle storage errors gracefully
     - _Requirements: 5.5, 16.5_
   
-  - [ ] 5.4 Write property test for export-import round trip
+  - [x] 5.4 Write property test for export-import round trip
     - **Property 15: Export-import round trip**
     - **Validates: Requirements 5.1, 5.2**
 
