@@ -1,3 +1,5 @@
+import type { Component } from "solid-js";
+
 // Core type definitions for tournament configurations and generated structures.
 
 export interface Participant {
@@ -80,6 +82,65 @@ export type TournamentConfig =
   | FFAConfig
   | FIFAConfig
   | RacingConfig;
+
+export interface ValidationError {
+  code: string;
+  message: string;
+  field?: string;
+}
+
+export type ValidationResult =
+  | { valid: true }
+  | { valid: false; errors: readonly ValidationError[] };
+
+export interface TournamentFormatMetadata {
+  readonly type: TournamentFormatType;
+  readonly name: string;
+  readonly description: string;
+  readonly icon: string;
+  readonly useCases: readonly string[];
+}
+
+export interface ConfigPanelProps<TConfig extends BaseTournamentConfig> {
+  config: TConfig;
+  onChange: (config: TConfig) => void;
+}
+
+export interface VisualizerProps<
+  TStructure extends TournamentStructure,
+  TConfig extends BaseTournamentConfig = BaseTournamentConfig,
+> {
+  config: TConfig;
+  structure: TStructure;
+}
+
+export interface FormatExport<
+  TConfig extends BaseTournamentConfig,
+  TStructure extends TournamentStructure,
+> {
+  version: string;
+  format: TournamentFormatType;
+  generatedAt: string;
+  config: TConfig;
+  structure: TStructure;
+  metadata?: Record<string, unknown>;
+}
+
+export interface TournamentFormat<
+  TConfig extends BaseTournamentConfig,
+  TStructure extends TournamentStructure = TournamentStructure,
+> {
+  readonly metadata: TournamentFormatMetadata;
+  createDefaultConfig(participants: Participant[]): TConfig;
+  validateConfig(config: TConfig): ValidationResult;
+  generateStructure(config: TConfig): TStructure;
+  ConfigPanel: Component<ConfigPanelProps<TConfig>>;
+  Visualizer: Component<VisualizerProps<TStructure, TConfig>>;
+  exportData?: (
+    config: TConfig,
+    structure: TStructure,
+  ) => FormatExport<TConfig, TStructure>;
+}
 
 export interface BracketStructure {
   type: "bracket";
@@ -186,7 +247,11 @@ export interface AdvancementRules {
   advanceMethod: "top-n" | "points" | "time";
 }
 
-export type RacingMode = "time-trial" | "grand-prix" | "knockout" | "championship";
+export type RacingMode =
+  | "time-trial"
+  | "grand-prix"
+  | "knockout"
+  | "championship";
 
 export interface RacingStructure {
   type: "racing";

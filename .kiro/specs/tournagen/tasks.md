@@ -20,7 +20,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Define `TournamentStructure` types (bracket, league, stage, racing)
     - _Requirements: 17.2_
   
-  - [ ] 2.2 Create tournament format plugin interface
+  - [x] 2.2 Create tournament format plugin interface
     - Define `TournamentFormat<TConfig>` interface with metadata, config, generation, and components
     - Define `ValidationResult` discriminated union
     - Create type-safe component prop interfaces
