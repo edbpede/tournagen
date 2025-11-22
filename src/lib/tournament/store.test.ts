@@ -4,6 +4,7 @@ import type {
   BaseTournamentConfig,
   ConfigPanelProps,
   Participant,
+  SingleEliminationOptions,
   VisualizerProps,
 } from "./types";
 import {
@@ -12,6 +13,7 @@ import {
   type TournamentFormat,
   type TournamentStructure,
 } from "./types";
+import { defaultSingleEliminationOptions } from "./formats/single-elimination/config";
 import {
   setCurrentFormat,
   setCurrentStep,
@@ -25,9 +27,12 @@ import {
 } from "./store";
 import { tournamentFormatRegistry } from "./registry";
 
-type SimpleConfig<T extends TournamentFormatType> = BaseTournamentConfig & {
-  formatType: T;
-};
+type SimpleConfig<T extends TournamentFormatType> =
+  BaseTournamentConfig & {
+    formatType: T;
+  } & (T extends TournamentFormatType.SingleElimination
+    ? { options: SingleEliminationOptions }
+    : { options?: SingleEliminationOptions });
 
 const createTestFormat = <T extends TournamentFormatType>(
   formatType: T,
@@ -52,14 +57,26 @@ const createTestFormat = <T extends TournamentFormatType>(
       icon: "test",
       useCases: ["test"],
     },
-    createDefaultConfig: (participants: Participant[]) => ({
-      id: `${formatType}-config`,
-      name: `${formatType} config`,
-      formatType,
-      participants,
-      createdAt: new Date(0),
-      updatedAt: new Date(0),
-    }),
+    createDefaultConfig: (participants: Participant[]) => {
+      const base = {
+        id: `${formatType}-config`,
+        name: `${formatType} config`,
+        formatType,
+        participants,
+        createdAt: new Date(0),
+        updatedAt: new Date(0),
+        options: undefined as SingleEliminationOptions | undefined,
+      };
+
+      if (formatType === TournamentFormatType.SingleElimination) {
+        return {
+          ...base,
+          options: { ...defaultSingleEliminationOptions },
+        } as SimpleConfig<T>;
+      }
+
+      return base as SimpleConfig<T>;
+    },
     validateConfig: () => ({ valid: true }),
     generateStructure: () => ({
       type: "bracket",
@@ -96,6 +113,19 @@ const resetState = () => {
   });
 };
 
+const createSingleEliminationConfig = (
+  participants: Participant[],
+  updatedAt = new Date(0),
+): TournamentConfig => ({
+  id: "cfg",
+  name: "Test Config",
+  formatType: TournamentFormatType.SingleElimination,
+  participants,
+  createdAt: new Date(0),
+  updatedAt,
+  options: { ...defaultSingleEliminationOptions },
+});
+
 describe("tournament store", () => {
   it("sets the current format with default config and resets state", () => {
     resetState();
@@ -123,17 +153,13 @@ describe("tournament store", () => {
     const initialUpdatedAt = new Date(0);
 
     setTournamentState({
-      currentConfig: {
-        id: "cfg",
-        name: "Test Config",
-        formatType: TournamentFormatType.SingleElimination,
-        participants: [
+      currentConfig: createSingleEliminationConfig(
+        [
           { id: "p1", name: "Alpha" },
           { id: "p2", name: "Bravo" },
         ],
-        createdAt: new Date(0),
-        updatedAt: initialUpdatedAt,
-      },
+        initialUpdatedAt,
+      ),
       currentStructure: { type: "bracket", rounds: [] },
       step: "participants",
       isDirty: false,
@@ -158,14 +184,10 @@ describe("tournament store", () => {
     const initialUpdatedAt = new Date(0);
 
     setTournamentState({
-      currentConfig: {
-        id: "cfg",
-        name: "Test Config",
-        formatType: TournamentFormatType.SingleElimination,
-        participants: [{ id: "p1", name: "Alpha" }],
-        createdAt: new Date(0),
-        updatedAt: initialUpdatedAt,
-      },
+      currentConfig: createSingleEliminationConfig(
+        [{ id: "p1", name: "Alpha" }],
+        initialUpdatedAt,
+      ),
       currentStructure: { type: "bracket", rounds: [] },
       step: "participants",
       isDirty: false,
@@ -190,14 +212,7 @@ describe("tournament store", () => {
     const initialUpdatedAt = new Date(0);
 
     setTournamentState({
-      currentConfig: {
-        id: "cfg",
-        name: "Test Config",
-        formatType: TournamentFormatType.SingleElimination,
-        participants: [],
-        createdAt: new Date(0),
-        updatedAt: initialUpdatedAt,
-      },
+      currentConfig: createSingleEliminationConfig([], initialUpdatedAt),
       currentStructure: { type: "bracket", rounds: [] },
       step: "participants",
       isDirty: false,
@@ -233,17 +248,13 @@ describe("tournament store", () => {
     const initialUpdatedAt = new Date(0);
 
     setTournamentState({
-      currentConfig: {
-        id: "cfg",
-        name: "Test Config",
-        formatType: TournamentFormatType.SingleElimination,
-        participants: [
+      currentConfig: createSingleEliminationConfig(
+        [
           { id: "p1", name: "Alpha" },
           { id: "p2", name: "Bravo" },
         ],
-        createdAt: new Date(0),
-        updatedAt: initialUpdatedAt,
-      },
+        initialUpdatedAt,
+      ),
       currentStructure: { type: "bracket", rounds: [] },
       step: "participants",
       isDirty: false,
@@ -266,17 +277,13 @@ describe("tournament store", () => {
     const initialUpdatedAt = new Date(0);
 
     setTournamentState({
-      currentConfig: {
-        id: "cfg",
-        name: "Test Config",
-        formatType: TournamentFormatType.SingleElimination,
-        participants: [
+      currentConfig: createSingleEliminationConfig(
+        [
           { id: "p1", name: "Alpha" },
           { id: "p2", name: "Bravo", seed: 1 },
         ],
-        createdAt: new Date(0),
-        updatedAt: initialUpdatedAt,
-      },
+        initialUpdatedAt,
+      ),
       currentStructure: { type: "bracket", rounds: [] },
       step: "participants",
       isDirty: false,
@@ -307,18 +314,14 @@ describe("tournament store", () => {
     const initialUpdatedAt = new Date(0);
 
     setTournamentState({
-      currentConfig: {
-        id: "cfg",
-        name: "Test Config",
-        formatType: TournamentFormatType.SingleElimination,
-        participants: [
+      currentConfig: createSingleEliminationConfig(
+        [
           { id: "p1", name: "Alpha", seed: 1 },
           { id: "p2", name: "Bravo", seed: 2 },
           { id: "p3", name: "Charlie", seed: 3 },
         ],
-        createdAt: new Date(0),
-        updatedAt: initialUpdatedAt,
-      },
+        initialUpdatedAt,
+      ),
       currentStructure: { type: "bracket", rounds: [] },
       step: "participants",
       isDirty: false,

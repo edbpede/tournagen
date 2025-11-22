@@ -4,14 +4,14 @@ import type { Component } from "solid-js";
 import { tournamentFormatRegistry } from "./registry";
 import {
   TournamentFormatType,
-  type BaseTournamentConfig,
   type ConfigPanelProps,
   type Participant,
-  type TournamentConfig,
   type TournamentFormat,
   type TournamentStructure,
+  type SingleEliminationConfig,
   type VisualizerProps,
 } from "./types";
+import { defaultSingleEliminationOptions } from "./formats/single-elimination/config";
 import {
   addParticipant,
   removeParticipant,
@@ -21,10 +21,10 @@ import {
 } from "./store";
 
 const ensureFormatRegistered = (
-  formatType: TournamentFormatType,
-): TournamentFormat<BaseTournamentConfig, TournamentStructure> => {
+  formatType: TournamentFormatType.SingleElimination,
+): TournamentFormat<SingleEliminationConfig, TournamentStructure> => {
   const existing =
-    tournamentFormatRegistry.get<BaseTournamentConfig, TournamentStructure>(
+    tournamentFormatRegistry.get<SingleEliminationConfig, TournamentStructure>(
       formatType,
     );
 
@@ -32,15 +32,15 @@ const ensureFormatRegistered = (
     return existing;
   }
 
-  const ConfigPanel: Component<ConfigPanelProps<BaseTournamentConfig>> = (
-    props,
-  ) => {
+  const ConfigPanel: Component<
+    ConfigPanelProps<SingleEliminationConfig>
+  > = (props) => {
     void props.config;
     return null;
   };
 
   const Visualizer: Component<
-    VisualizerProps<TournamentStructure, BaseTournamentConfig>
+    VisualizerProps<TournamentStructure, SingleEliminationConfig>
   > = (props) => {
     void props.structure;
     return null;
@@ -61,12 +61,13 @@ const ensureFormatRegistered = (
       participants,
       createdAt: new Date(0),
       updatedAt: new Date(0),
+      options: { ...defaultSingleEliminationOptions },
     }),
     validateConfig: () => ({ valid: true }),
     generateStructure: () => ({ type: "bracket", rounds: [] }),
     ConfigPanel,
     Visualizer,
-  } satisfies TournamentFormat<BaseTournamentConfig, TournamentStructure>;
+  } satisfies TournamentFormat<SingleEliminationConfig, TournamentStructure>;
 
   tournamentFormatRegistry.register(format);
   return format;
@@ -131,6 +132,7 @@ const resetStateWithParticipants = (participants: readonly Participant[]) => {
       })),
       createdAt: new Date(0),
       updatedAt: new Date(0),
+      options: { ...defaultSingleEliminationOptions },
     },
     currentStructure: { type: "bracket", rounds: [] },
     step: "participants",

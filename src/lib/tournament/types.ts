@@ -32,9 +32,35 @@ export interface BaseTournamentConfig {
   metadata?: Record<string, unknown>;
 }
 
+export type SingleEliminationBracketSize =
+  | "auto"
+  | 2
+  | 4
+  | 8
+  | 16
+  | 32
+  | 64
+  | 128;
+
+export type SingleEliminationSeedingMethod =
+  | "random"
+  | "seeded"
+  | "manual";
+
+export interface SingleEliminationOptions {
+  readonly bracketSize: SingleEliminationBracketSize;
+  readonly thirdPlacePlayoff: boolean;
+  readonly seedingMethod: SingleEliminationSeedingMethod;
+  /**
+   * Optional manual ordering of participant IDs, top-to-bottom.
+   * Used when seedingMethod is "manual".
+   */
+  readonly manualSeedOrder?: readonly string[];
+}
+
 export interface SingleEliminationConfig extends BaseTournamentConfig {
   formatType: TournamentFormatType.SingleElimination;
-  options?: Record<string, unknown>;
+  options: SingleEliminationOptions;
 }
 
 export interface DoubleEliminationConfig extends BaseTournamentConfig {

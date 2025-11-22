@@ -142,7 +142,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - **Validates: Requirements 3.1, 3.3, 3.4, 3.5**
 
 - [ ] 8. Implement single elimination format
-  - [ ] 8.1 Create single elimination types and config
+  - [x] 8.1 Create single elimination types and config
     - Define `SingleEliminationConfig` interface
     - Define `SingleEliminationOptions` interface
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_

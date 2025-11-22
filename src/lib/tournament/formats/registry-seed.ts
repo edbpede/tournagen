@@ -2,13 +2,16 @@ import type { Component } from "solid-js";
 import { tournamentFormatRegistry } from "../registry";
 import type {
   BaseTournamentConfig,
+  BracketStructure,
   ConfigPanelProps,
+  SingleEliminationConfig,
   TournamentFormat,
   TournamentFormatMetadata,
   TournamentStructure,
   VisualizerProps,
 } from "../types";
 import { TournamentFormatType } from "../types";
+import { createDefaultSingleEliminationConfig } from "./single-elimination/config";
 
 type BaseConfigFor<T extends TournamentFormatType> = BaseTournamentConfig & {
   formatType: T;
@@ -37,7 +40,7 @@ const createPlaceholderVisualizer = <
   return Visualizer;
 };
 
-const createDefaultStructure = (): TournamentStructure => ({
+const createDefaultStructure = (): BracketStructure => ({
   type: "bracket",
   rounds: [],
 });
@@ -59,25 +62,36 @@ const createRacingStructure = (): TournamentStructure => ({
   events: [],
 });
 
+const singleEliminationMetadata: TournamentFormatMetadata = {
+  type: TournamentFormatType.SingleElimination,
+  name: "Single Elimination",
+  description:
+    "Fast knockout brackets that auto-fill byes and cleanly show who advances each round.",
+  icon: "🏆",
+  useCases: [
+    "Best for 4-64 players",
+    "When time is limited",
+    "Streams and playoffs",
+  ],
+};
+
+const singleEliminationFormat: TournamentFormat<
+  SingleEliminationConfig,
+  BracketStructure
+> = {
+  metadata: singleEliminationMetadata,
+  createDefaultConfig: (participants) =>
+    createDefaultSingleEliminationConfig(participants),
+  validateConfig: () => ({ valid: true }),
+  generateStructure: () => createDefaultStructure(),
+  ConfigPanel: createPlaceholderConfigPanel<SingleEliminationConfig>(),
+  Visualizer: createPlaceholderVisualizer<SingleEliminationConfig>(),
+};
+
 const defaultFormats: ReadonlyArray<{
   metadata: TournamentFormatMetadata;
   structure: () => TournamentStructure;
 }> = [
-  {
-    metadata: {
-      type: TournamentFormatType.SingleElimination,
-      name: "Single Elimination",
-      description:
-        "Fast knockout brackets that auto-fill byes and cleanly show who advances each round.",
-      icon: "🏆",
-      useCases: [
-        "Best for 4-64 players",
-        "When time is limited",
-        "Streams and playoffs",
-      ],
-    },
-    structure: createDefaultStructure,
-  },
   {
     metadata: {
       type: TournamentFormatType.DoubleElimination,
@@ -205,6 +219,15 @@ const createFormat = <T extends TournamentFormatType>(
 });
 
 export const ensureDefaultFormatsRegistered = (): void => {
+  const existingSingle =
+    tournamentFormatRegistry.get<SingleEliminationConfig, BracketStructure>(
+      TournamentFormatType.SingleElimination,
+    );
+
+  if (!existingSingle) {
+    tournamentFormatRegistry.register(singleEliminationFormat);
+  }
+
   defaultFormats.forEach(({ metadata, structure }) => {
     const existing =
       tournamentFormatRegistry.get<BaseTournamentConfig, TournamentStructure>(
