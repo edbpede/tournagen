@@ -1,5 +1,6 @@
 import type { BracketMatch, BracketStructure } from "../../types";
 import type { SingleEliminationConfig } from "../../types";
+import { applySeedingMethod } from "../../../utils/seeding";
 
 const MINIMUM_SLOTS = 2;
 
@@ -101,10 +102,6 @@ export const generateSingleEliminationBracket = (
     participantCount,
     nextPowerOfTwo(participantCount),
   );
-  const matchCount = totalSlots / 2;
-  const byes = Math.max(0, totalSlots - participantCount);
-  const matchesWithBye = Math.min(byes, matchCount);
-  const fullMatchCount = matchCount - matchesWithBye;
   const totalRounds =
     participantCount < 2 ? 0 : Math.ceil(Math.log2(totalSlots));
 
@@ -132,22 +129,35 @@ export const generateSingleEliminationBracket = (
     };
   });
 
-  const participantQueue = [...config.participants];
+  const seededSlots = applySeedingMethod(config.participants, {
+    method: config.options.seedingMethod,
+    bracketSize: totalSlots,
+    manualOrder: config.options.manualSeedOrder,
+  });
   const firstRound = rounds[0];
 
   firstRound.matches.forEach((match, index) => {
-    if (index < fullMatchCount) {
-      match.participant1 = participantQueue.shift() ?? null;
-      match.participant2 = participantQueue.shift() ?? null;
+    const slotIndex = index * 2;
+    const participant1 = seededSlots[slotIndex] ?? null;
+    const participant2 = seededSlots[slotIndex + 1] ?? null;
+
+    match.participant1 = participant1;
+    match.participant2 = participant2;
+
+    if (participant1 && participant2) {
       match.isBye = false;
+      match.winner = null;
       return;
     }
 
-    const soloParticipant = participantQueue.shift() ?? null;
-    match.participant1 = soloParticipant;
-    match.participant2 = null;
-    match.isBye = soloParticipant !== null;
-    match.winner = soloParticipant;
+    if (!participant1 && !participant2) {
+      match.isBye = false;
+      match.winner = null;
+      return;
+    }
+
+    match.isBye = true;
+    match.winner = participant1 ?? participant2;
   });
 
   for (let roundIndex = 0; roundIndex < rounds.length - 1; roundIndex += 1) {

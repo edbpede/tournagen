@@ -81,4 +81,23 @@ describe("generateSingleEliminationBracket", () => {
 
     expect(bracket.thirdPlaceMatch === undefined).toBe(true);
   });
+
+  it("applies seeded ordering so the highest seeds receive byes first", () => {
+    const config = createDefaultSingleEliminationConfig(createParticipants(6));
+
+    const bracket = generateSingleEliminationBracket({
+      ...config,
+      options: {
+        ...config.options,
+        seedingMethod: "seeded",
+      },
+    });
+
+    const byeWinners = bracket.rounds[0].matches
+      .filter((match) => match.isBye)
+      .map((match) => match.winner?.id);
+
+    expect(byeWinners.includes("p-1")).toBe(true);
+    expect(byeWinners.includes("p-2")).toBe(true);
+  });
 });

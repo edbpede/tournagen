@@ -155,7 +155,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Add third-place playoff if enabled
     - _Requirements: 6.1, 6.2, 6.3, 6.4_
   
-  - [ ] 8.3 Implement seeding utilities
+  - [x] 8.3 Implement seeding utilities
     - Create `applySeedingMethod` function supporting random, seeded, manual
     - Implement standard seeding algorithm (1 vs N, 2 vs N-1, etc.)
     - _Requirements: 6.5_
