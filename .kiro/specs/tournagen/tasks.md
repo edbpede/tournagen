@@ -75,7 +75,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Handle invalid JSON, schema errors, and missing formats
     - _Requirements: 5.2, 5.3_
   
-  - [ ] 5.3 Implement local storage persistence
+- [ ] 5.3 Implement local storage persistence
     - Create `saveToLocalStorage` and `loadFromLocalStorage` functions
     - Validate data from local storage before loading
     - Handle storage errors gracefully

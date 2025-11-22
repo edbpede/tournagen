@@ -11,6 +11,7 @@ import type {
 const EXPORT_VERSION = "1.0.0";
 const DOWNLOAD_MIME_TYPE = "application/json";
 const FILENAME_PREFIX = "tournagen";
+export const LOCAL_STORAGE_KEY = "tournagen:last-tournament";
 
 export interface ExportTournamentOptions<
   TConfig extends BaseTournamentConfig,
@@ -357,4 +358,185 @@ function parseDate(value: unknown): Date | null {
 
   const parsed = value instanceof Date ? value : new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+export interface SaveToLocalStorageOptions<
+  TConfig extends BaseTournamentConfig,
+  TStructure extends TournamentStructure,
+> extends ExportTournamentOptions<TConfig, TStructure> {
+  readonly key?: string;
+  readonly storage?: Storage;
+}
+
+export type SaveToLocalStorageErrorCode = "unavailable" | "save-failed";
+
+export type SaveToLocalStorageResult<
+  TConfig extends BaseTournamentConfig,
+  TStructure extends TournamentStructure,
+> =
+  | {
+      success: true;
+      key: string;
+      payload: FormatExport<TConfig, TStructure>;
+      json: string;
+    }
+  | {
+      success: false;
+      error: {
+        code: SaveToLocalStorageErrorCode;
+        message: string;
+        details?: readonly string[];
+      };
+    };
+
+export function saveToLocalStorage<
+  TConfig extends BaseTournamentConfig,
+  TStructure extends TournamentStructure,
+>(options: SaveToLocalStorageOptions<TConfig, TStructure>): SaveToLocalStorageResult<
+  TConfig,
+  TStructure
+> {
+  const storage = options.storage ?? getLocalStorage();
+
+  if (!storage) {
+    return {
+      success: false,
+      error: {
+        code: "unavailable",
+        message: "Local storage is not available in this environment.",
+      },
+    };
+  }
+
+  const key = options.key ?? LOCAL_STORAGE_KEY;
+
+  try {
+    const { payload, json } = exportTournament({
+      ...options,
+      download: () => undefined,
+    });
+
+    storage.setItem(key, json);
+
+    return { success: true, key, payload, json };
+  } catch (error) {
+    return {
+      success: false,
+      error: {
+        code: "save-failed",
+        message: "Failed to save tournament to local storage.",
+        details: [error instanceof Error ? error.message : "Unknown error"],
+      },
+    };
+  }
+}
+
+export interface LoadFromLocalStorageOptions {
+  readonly key?: string;
+  readonly registry?: TournamentFormatRegistryLike;
+  readonly storage?: Storage;
+}
+
+export type LoadFromLocalStorageErrorCode =
+  | "unavailable"
+  | "not-found"
+  | ImportTournamentErrorCode;
+
+export type LoadFromLocalStorageResult<
+  TConfig extends BaseTournamentConfig = TournamentConfig,
+  TStructure extends TournamentStructure = TournamentStructure,
+> =
+  | (ImportTournamentSuccess<TConfig, TStructure> & {
+      key: string;
+      source: "local-storage";
+    })
+  | {
+      success: false;
+      key: string;
+      source: "local-storage";
+      error: {
+        code: LoadFromLocalStorageErrorCode;
+        message: string;
+        details?: readonly string[];
+      };
+    };
+
+export function loadFromLocalStorage(
+  options: LoadFromLocalStorageOptions = {},
+): LoadFromLocalStorageResult {
+  const storage = options.storage ?? getLocalStorage();
+
+  if (!storage) {
+    return {
+      success: false,
+      key: options.key ?? LOCAL_STORAGE_KEY,
+      source: "local-storage",
+      error: {
+        code: "unavailable",
+        message: "Local storage is not available in this environment.",
+      },
+    };
+  }
+
+  const key = options.key ?? LOCAL_STORAGE_KEY;
+  let raw: string | null;
+
+  try {
+    raw = storage.getItem(key);
+  } catch (error) {
+    return {
+      success: false,
+      key,
+      source: "local-storage",
+      error: {
+        code: "unavailable",
+        message: "Unable to access local storage.",
+        details: [error instanceof Error ? error.message : "Unknown error"],
+      },
+    };
+  }
+
+  if (!raw) {
+    return {
+      success: false,
+      key,
+      source: "local-storage",
+      error: {
+        code: "not-found",
+        message: "No saved tournament was found in local storage.",
+      },
+    };
+  }
+
+  const result = importTournament({
+    json: raw,
+    registry: options.registry,
+  });
+
+  if (!result.success) {
+    return {
+      success: false,
+      key,
+      source: "local-storage",
+      error: result.error,
+    };
+  }
+
+  return { ...result, key, source: "local-storage" };
+}
+
+function getLocalStorage(): Storage | null {
+  if (typeof localStorage === "undefined") {
+    return null;
+  }
+
+  try {
+    const probeKey = `${LOCAL_STORAGE_KEY}-probe`;
+    localStorage.setItem(probeKey, "1");
+    localStorage.removeItem(probeKey);
+    return localStorage;
+  } catch (error) {
+    console.warn("Local storage unavailable", error);
+    return null;
+  }
 }

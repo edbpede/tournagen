@@ -4,6 +4,9 @@ import { tournamentFormatRegistry } from "../tournament/registry";
 import {
   exportTournament,
   importTournament,
+  loadFromLocalStorage,
+  LOCAL_STORAGE_KEY,
+  saveToLocalStorage,
   type ImportTournamentResult,
 } from "./export";
 import type {
@@ -269,5 +272,117 @@ describe("importTournament", () => {
 
     expect(result.error.code).toBe("validation-failed");
     expect(result.error.details?.[0] ?? "").toMatch(/participants/);
+  });
+});
+
+class MemoryStorage implements Storage {
+  private readonly store = new Map<string, string>();
+
+  clear(): void {
+    this.store.clear();
+  }
+
+  getItem(key: string): string | null {
+    return this.store.has(key) ? this.store.get(key)! : null;
+  }
+
+  key(index: number): string | null {
+    return Array.from(this.store.keys())[index] ?? null;
+  }
+
+  get length(): number {
+    return this.store.size;
+  }
+
+  removeItem(key: string): void {
+    this.store.delete(key);
+  }
+
+  setItem(key: string, value: string): void {
+    this.store.set(key, value);
+  }
+}
+
+class ThrowingStorage extends MemoryStorage {
+  override setItem(): void {
+    throw new Error("Storage disabled");
+  }
+}
+
+describe("local storage persistence", () => {
+  it("saves and loads a tournament payload with validation", () => {
+    ensureFormatRegistered(TournamentFormatType.SingleElimination);
+    const storage = new MemoryStorage();
+
+    const saveResult = saveToLocalStorage({
+      config: baseConfig,
+      structure: baseStructure,
+      storage,
+      generatedAt: new Date("2024-03-04T05:06:07.000Z"),
+    });
+
+    expect(saveResult.success).toBe(true);
+    if (!saveResult.success) {
+      return;
+    }
+
+    const stored = storage.getItem(LOCAL_STORAGE_KEY);
+    expect(stored !== null).toBe(true);
+
+    const loadResult = loadFromLocalStorage({ storage });
+    expect(loadResult.success).toBe(true);
+    if (!loadResult.success) {
+      return;
+    }
+
+    expect(loadResult.format).toBe(TournamentFormatType.SingleElimination);
+    expect(loadResult.config.name).toBe(baseConfig.name);
+    expect(loadResult.key).toBe(LOCAL_STORAGE_KEY);
+  });
+
+  it("returns not-found when nothing is stored", () => {
+    const storage = new MemoryStorage();
+
+    const result = loadFromLocalStorage({ storage, key: "empty-slot" });
+
+    expect(result.success).toBe(false);
+    if (result.success) {
+      return;
+    }
+
+    expect(result.error.code).toBe("not-found");
+    expect(result.key).toBe("empty-slot");
+  });
+
+  it("handles storage failures gracefully when saving", () => {
+    const storage = new ThrowingStorage();
+
+    const result = saveToLocalStorage({
+      config: baseConfig,
+      structure: baseStructure,
+      storage,
+    });
+
+    expect(result.success).toBe(false);
+    if (result.success) {
+      return;
+    }
+
+    expect(result.error.code).toBe("save-failed");
+  });
+
+  it("validates and reports errors for invalid stored payloads", () => {
+    ensureFormatRegistered(TournamentFormatType.SingleElimination);
+    const storage = new MemoryStorage();
+    storage.setItem(LOCAL_STORAGE_KEY, "not-json");
+
+    const result = loadFromLocalStorage({ storage });
+
+    expect(result.success).toBe(false);
+    if (result.success) {
+      return;
+    }
+
+    expect(result.error.code).toBe("invalid-json");
   });
 });
