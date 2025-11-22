@@ -105,7 +105,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Update global state step on navigation
     - _Requirements: 2.2_
 
-- [ ] 7. Build participant manager island
+- [x] 7. Build participant manager island
   - [x] 7.1 Create participant list component
     - Use `<For>` for participant rendering (not `.map()`)
     - Display participant name, seed, and optional fields
@@ -134,7 +134,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Store in participant object
     - _Requirements: 3.5_
   
-  - [ ] 7.6 Write property tests for participant operations
+  - [x] 7.6 Write property tests for participant operations
     - **Property 7: Participant addition**
     - **Property 8: Participant removal**
     - **Property 9: Participant reordering**
