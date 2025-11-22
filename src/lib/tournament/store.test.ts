@@ -21,6 +21,7 @@ import {
   updateMultipleParticipants,
   updateParticipant,
   removeParticipant,
+  reorderParticipant,
 } from "./store";
 import { tournamentFormatRegistry } from "./registry";
 
@@ -250,6 +251,42 @@ describe("tournament store", () => {
     expect(tournamentState.currentConfig?.participants[1].id).toBe("p2");
     expect(tournamentState.currentConfig?.participants[1].name).toBe("Bravo");
     expect(tournamentState.currentConfig?.participants[1].seed).toBe(3);
+    expect(tournamentState.currentStructure === null).toBe(true);
+    expect(tournamentState.isDirty).toBe(true);
+    expect(
+      (tournamentState.currentConfig?.updatedAt.getTime() ?? 0) >
+        initialUpdatedAt.getTime(),
+    ).toBe(true);
+  });
+
+  it("reorders participants, reseeds them, and resets the current structure", () => {
+    resetState();
+    const initialUpdatedAt = new Date(0);
+
+    setTournamentState({
+      currentConfig: {
+        id: "cfg",
+        name: "Test Config",
+        formatType: TournamentFormatType.SingleElimination,
+        participants: [
+          { id: "p1", name: "Alpha", seed: 1 },
+          { id: "p2", name: "Bravo", seed: 2 },
+          { id: "p3", name: "Charlie", seed: 3 },
+        ],
+        createdAt: new Date(0),
+        updatedAt: initialUpdatedAt,
+      },
+      currentStructure: { type: "bracket", rounds: [] },
+      step: "participants",
+      isDirty: false,
+    });
+
+    reorderParticipant("p2", "up");
+
+    const order = tournamentState.currentConfig?.participants.map((p) => p.id);
+    expect(order?.join(",")).toBe("p2,p1,p3");
+    const seeds = tournamentState.currentConfig?.participants.map((p) => p.seed);
+    expect(seeds?.join(",")).toBe("1,2,3");
     expect(tournamentState.currentStructure === null).toBe(true);
     expect(tournamentState.isDirty).toBe(true);
     expect(

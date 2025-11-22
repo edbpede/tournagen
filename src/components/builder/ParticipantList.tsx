@@ -4,12 +4,15 @@ import {
   currentParticipants,
   removeParticipant,
   updateParticipant,
+  reorderParticipant,
 } from "@/lib/tournament/store";
 import type { Participant } from "@/lib/tournament/types";
 
 interface ParticipantListItemProps {
   participant: Participant;
   index: number;
+  isFirst: boolean;
+  isLast: boolean;
 }
 
 const ParticipantListItem: Component<ParticipantListItemProps> = (props) => {
@@ -90,6 +93,14 @@ const ParticipantListItem: Component<ParticipantListItemProps> = (props) => {
     removeParticipant(props.participant.id);
   };
 
+  const handleMoveUp = () => {
+    reorderParticipant(props.participant.id, "up");
+  };
+
+  const handleMoveDown = () => {
+    reorderParticipant(props.participant.id, "down");
+  };
+
   return (
     <article
       class="flex items-start justify-between gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-3 shadow-soft"
@@ -145,7 +156,27 @@ const ParticipantListItem: Component<ParticipantListItemProps> = (props) => {
         <span class="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-semibold text-neutral-700">
           #{props.index + 1}
         </span>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center justify-end gap-2 sm:justify-start">
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              onClick={handleMoveUp}
+              disabled={props.isFirst}
+              aria-label={`Move ${props.participant.name} up`}
+            >
+              Move up
+            </button>
+            <button
+              type="button"
+              class="btn btn-ghost"
+              onClick={handleMoveDown}
+              disabled={props.isLast}
+              aria-label={`Move ${props.participant.name} down`}
+            >
+              Move down
+            </button>
+          </div>
           <Show
             when={isEditing()}
             fallback={
@@ -217,7 +248,12 @@ const ParticipantList: Component = () => {
         <div class="space-y-2" role="list" aria-label="Current participants">
           <For each={participants()}>
             {(participant, index) => (
-              <ParticipantListItem participant={participant} index={index()} />
+              <ParticipantListItem
+                participant={participant}
+                index={index()}
+                isFirst={index() === 0}
+                isLast={index() === participants().length - 1}
+              />
             )}
           </For>
         </div>

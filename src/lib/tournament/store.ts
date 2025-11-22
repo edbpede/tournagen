@@ -214,3 +214,46 @@ export function removeParticipant(participantId: string): void {
     setTournamentState("isDirty", true);
   });
 }
+
+export function reorderParticipant(
+  participantId: string,
+  direction: "up" | "down",
+): void {
+  if (!tournamentState.currentConfig) {
+    return;
+  }
+
+  const participants = tournamentState.currentConfig.participants;
+  const currentIndex = participants.findIndex(
+    (participant) => participant.id === participantId,
+  );
+
+  if (currentIndex < 0) {
+    return;
+  }
+
+  const targetIndex =
+    direction === "up" ? currentIndex - 1 : currentIndex + 1;
+
+  if (targetIndex < 0 || targetIndex >= participants.length) {
+    return;
+  }
+
+  const reordered = [...participants];
+  const [moved] = reordered.splice(currentIndex, 1);
+  reordered.splice(targetIndex, 0, moved);
+
+  const reseeded = reordered.map((participant, index) => ({
+    ...participant,
+    seed: index + 1,
+  }));
+
+  const timestamp = new Date();
+
+  batch(() => {
+    setTournamentState("currentConfig", "participants", reseeded);
+    setTournamentState("currentConfig", "updatedAt", timestamp);
+    setTournamentState("currentStructure", null);
+    setTournamentState("isDirty", true);
+  });
+}
