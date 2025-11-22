@@ -92,7 +92,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Set up error boundary for islands
     - _Requirements: 2.1_
   
-  - [ ] 6.2 Create format selector island
+  - [x] 6.2 Create format selector island
     - Build SolidJS component with format cards
     - Use `<For>` to render formats from registry
     - Update global state on selection

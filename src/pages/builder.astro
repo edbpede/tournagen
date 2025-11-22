@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import BuilderProgress from "@components/builder/BuilderProgress";
+import FormatSelector from "@components/builder/FormatSelector";
 import IslandErrorBoundary from "@components/builder/IslandErrorBoundary";
 import PlaceholderPanel from "@components/builder/PlaceholderPanel";
 import { ensureDefaultFormatsRegistered } from "@/lib/tournament/formats/registry-seed";
@@ -101,10 +102,7 @@ ensureDefaultFormatsRegistered();
                                 client:load
                                 title="Format selection"
                             >
-                                <PlaceholderPanel
-                                    title="Format selector island"
-                                    description="Render available formats from the registry and set the active configuration."
-                                />
+                                <FormatSelector client:load />
                             </IslandErrorBoundary>
                         </section>
 
