@@ -1,0 +1,199 @@
+import { describe, expect, it } from "bun:test";
+import type { Component } from "solid-js";
+import type {
+  BaseTournamentConfig,
+  ConfigPanelProps,
+  Participant,
+  VisualizerProps,
+} from "./types";
+import {
+  TournamentFormatType,
+  type TournamentConfig,
+  type TournamentFormat,
+  type TournamentStructure,
+} from "./types";
+import {
+  setCurrentFormat,
+  setCurrentStep,
+  setTournamentState,
+  tournamentState,
+  updateMultipleParticipants,
+  updateParticipant,
+} from "./store";
+import { tournamentFormatRegistry } from "./registry";
+
+type SimpleConfig<T extends TournamentFormatType> = BaseTournamentConfig & {
+  formatType: T;
+};
+
+const createTestFormat = <T extends TournamentFormatType>(
+  formatType: T,
+): TournamentFormat<SimpleConfig<T>, TournamentStructure> => {
+  const ConfigPanel: Component<ConfigPanelProps<SimpleConfig<T>>> = (props) => {
+    void props.config.name;
+    return null;
+  };
+
+  const Visualizer: Component<
+    VisualizerProps<TournamentStructure, SimpleConfig<T>>
+  > = (props) => {
+    void props.structure;
+    return null;
+  };
+
+  return {
+    metadata: {
+      type: formatType,
+      name: `${formatType} format`,
+      description: "Test format",
+      icon: "test",
+      useCases: ["test"],
+    },
+    createDefaultConfig: (participants: Participant[]) => ({
+      id: `${formatType}-config`,
+      name: `${formatType} config`,
+      formatType,
+      participants,
+      createdAt: new Date(0),
+      updatedAt: new Date(0),
+    }),
+    validateConfig: () => ({ valid: true }),
+    generateStructure: () => ({
+      type: "bracket",
+      rounds: [],
+    }),
+    ConfigPanel,
+    Visualizer,
+  };
+};
+
+const ensureFormatRegistered = (formatType: TournamentFormatType) => {
+  const existing =
+    tournamentFormatRegistry.get<TournamentConfig, TournamentStructure>(
+      formatType,
+    );
+
+  if (existing) {
+    return existing;
+  }
+
+  const format = createTestFormat(formatType);
+  tournamentFormatRegistry.register(format);
+  return format;
+};
+
+ensureFormatRegistered(TournamentFormatType.SingleElimination);
+
+const resetState = () => {
+  setTournamentState({
+    currentConfig: null,
+    currentStructure: null,
+    step: "format-selection",
+    isDirty: false,
+  });
+};
+
+describe("tournament store", () => {
+  it("sets the current format with default config and resets state", () => {
+    resetState();
+    const participants: Participant[] = [
+      { id: "p1", name: "Alpha" },
+      { id: "p2", name: "Bravo" },
+    ];
+
+    setCurrentFormat(TournamentFormatType.SingleElimination, participants);
+
+    expect(tournamentState.currentConfig?.formatType).toBe(
+      TournamentFormatType.SingleElimination,
+    );
+    expect(tournamentState.currentConfig?.participants.length).toBe(2);
+    expect(
+      (tournamentState.currentConfig?.updatedAt?.getTime() ?? 0) > 0,
+    ).toBe(true);
+    expect(tournamentState.currentStructure === null).toBe(true);
+    expect(tournamentState.step).toBe("configuration");
+    expect(tournamentState.isDirty).toBe(false);
+  });
+
+  it("updates a participant with fine-grained store updates", () => {
+    resetState();
+    const initialUpdatedAt = new Date(0);
+
+    setTournamentState({
+      currentConfig: {
+        id: "cfg",
+        name: "Test Config",
+        formatType: TournamentFormatType.SingleElimination,
+        participants: [
+          { id: "p1", name: "Alpha" },
+          { id: "p2", name: "Bravo" },
+        ],
+        createdAt: new Date(0),
+        updatedAt: initialUpdatedAt,
+      },
+      currentStructure: { type: "bracket", rounds: [] },
+      step: "participants",
+      isDirty: false,
+    });
+
+    updateParticipant("p1", { name: "Updated", seed: 2 });
+
+    expect(tournamentState.currentConfig?.participants[0].id).toBe("p1");
+    expect(tournamentState.currentConfig?.participants[0].name).toBe("Updated");
+    expect(tournamentState.currentConfig?.participants[0].seed).toBe(2);
+    expect(tournamentState.currentConfig?.participants[1].name).toBe("Bravo");
+    expect(tournamentState.currentStructure === null).toBe(true);
+    expect(tournamentState.isDirty).toBe(true);
+    expect(
+      (tournamentState.currentConfig?.updatedAt.getTime() ?? 0) >
+        initialUpdatedAt.getTime(),
+    ).toBe(true);
+  });
+
+  it("updates multiple participants in a batch", () => {
+    resetState();
+    const initialUpdatedAt = new Date(0);
+
+    setTournamentState({
+      currentConfig: {
+        id: "cfg",
+        name: "Test Config",
+        formatType: TournamentFormatType.SingleElimination,
+        participants: [
+          { id: "p1", name: "Alpha" },
+          { id: "p2", name: "Bravo", seed: 1 },
+        ],
+        createdAt: new Date(0),
+        updatedAt: initialUpdatedAt,
+      },
+      currentStructure: { type: "bracket", rounds: [] },
+      step: "participants",
+      isDirty: false,
+    });
+
+    updateMultipleParticipants([
+      { id: "p1", changes: { name: "Updated Alpha" } },
+      { id: "p2", changes: { seed: 3 } },
+    ]);
+
+    expect(tournamentState.currentConfig?.participants[0].id).toBe("p1");
+    expect(tournamentState.currentConfig?.participants[0].name).toBe(
+      "Updated Alpha",
+    );
+    expect(tournamentState.currentConfig?.participants[1].id).toBe("p2");
+    expect(tournamentState.currentConfig?.participants[1].name).toBe("Bravo");
+    expect(tournamentState.currentConfig?.participants[1].seed).toBe(3);
+    expect(tournamentState.currentStructure === null).toBe(true);
+    expect(tournamentState.isDirty).toBe(true);
+    expect(
+      (tournamentState.currentConfig?.updatedAt.getTime() ?? 0) >
+        initialUpdatedAt.getTime(),
+    ).toBe(true);
+  });
+
+  it("updates the current builder step", () => {
+    resetState();
+    setCurrentStep("participants");
+    expect(tournamentState.step).toBe("participants");
+  });
+});

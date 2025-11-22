@@ -31,14 +31,14 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Export global registry instance
     - _Requirements: 17.1, 17.5_
 
-- [ ] 3. Create global state management
+- [x] 3. Create global state management
   - [x] 3.1 Implement tournament state store
     - Create `TournamentState` interface with currentConfig, currentStructure, step, isDirty
     - Export global store using `createStore` (not `createSignal` - nested object)
     - Create derived memos for currentFormat and other computed values
     - _Requirements: 2.4, 15.3_
   
-  - [ ] 3.2 Create state update utilities
+  - [x] 3.2 Create state update utilities
     - Implement `updateParticipant` with fine-grained store updates
     - Implement `updateMultipleParticipants` using `batch()`
     - Implement `setCurrentFormat` and `setCurrentStep`
