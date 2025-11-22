@@ -44,7 +44,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Implement `setCurrentFormat` and `setCurrentStep`
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 4. Build landing page
+- [x] 4. Build landing page
   - [x] 4.1 Create hero section component
     - Build static Astro component with heading, description, and CTA button
     - Apply design system styles using UnoCSS shortcuts
@@ -56,7 +56,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Apply card styles with hover effects
     - _Requirements: 1.2, 1.3_
   
-  - [ ] 4.3 Build landing page with dynamic format cards
+  - [x] 4.3 Build landing page with dynamic format cards
     - Create `index.astro` with hero, format cards section, and features
     - Dynamically generate format cards from registry
     - Add responsive layout with breakpoints
