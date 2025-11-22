@@ -99,7 +99,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Apply proper `Component<Props>` typing without prop destructuring
     - _Requirements: 2.1, 17.5, 18.2_
   
-  - [ ] 6.3 Create step navigation component
+- [ ] 6.3 Create step navigation component
     - Build navigation with back/next buttons
     - Disable back on first step
     - Update global state step on navigation

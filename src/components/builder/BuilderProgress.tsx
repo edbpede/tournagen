@@ -1,40 +1,11 @@
 import { For, createMemo } from "solid-js";
 import type { Component } from "solid-js";
-import type { BuilderStep } from "@/lib/tournament/store";
+import { builderSteps, findStepIndex } from "@/lib/tournament/builder-steps";
 import { tournamentState } from "@/lib/tournament/store";
-
-interface StepDefinition {
-  readonly id: BuilderStep;
-  readonly title: string;
-  readonly description: string;
-}
-
-const steps: readonly StepDefinition[] = [
-  {
-    id: "format-selection",
-    title: "Choose a format",
-    description: "Pick the tournament shape that fits your event.",
-  },
-  {
-    id: "configuration",
-    title: "Configure rules",
-    description: "Adjust rounds, seeding, and format-specific options.",
-  },
-  {
-    id: "participants",
-    title: "Add participants",
-    description: "Manage entrants, seeds, and optional metadata.",
-  },
-  {
-    id: "review",
-    title: "Review & export",
-    description: "Preview structure, then export or save locally.",
-  },
-];
 
 const BuilderProgress: Component<{ class?: string }> = (props) => {
   const currentIndex = createMemo(() =>
-    steps.findIndex((step) => step.id === tournamentState.step),
+    findStepIndex(tournamentState.step),
   );
 
   const containerClass = () =>
@@ -57,12 +28,12 @@ const BuilderProgress: Component<{ class?: string }> = (props) => {
           </p>
         </div>
         <div class="hidden sm:block text-sm font-semibold text-brand-700">
-          Step {currentIndex() + 1} of {steps.length}
+          Step {currentIndex() + 1} of {builderSteps.length}
         </div>
       </div>
 
       <ol class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" role="list">
-        <For each={steps}>
+        <For each={builderSteps}>
           {(step, index) => {
             const idx = index();
             const status = () => {
@@ -87,7 +58,7 @@ const BuilderProgress: Component<{ class?: string }> = (props) => {
                 class="relative flex flex-col gap-3 rounded-lg border border-neutral-200 bg-white/90 p-4 shadow-soft"
                 aria-current={isCurrent() ? "step" : undefined}
               >
-                {idx < steps.length - 1 && (
+                {idx < builderSteps.length - 1 && (
                   <span class="pointer-events-none absolute right-[-12px] top-1/2 hidden h-px w-6 -translate-y-1/2 bg-neutral-200 lg:block" />
                 )}
                 <div class="flex items-center gap-3">

@@ -4,6 +4,7 @@ import BuilderProgress from "@components/builder/BuilderProgress";
 import FormatSelector from "@components/builder/FormatSelector";
 import IslandErrorBoundary from "@components/builder/IslandErrorBoundary";
 import PlaceholderPanel from "@components/builder/PlaceholderPanel";
+import StepNavigation from "@components/builder/StepNavigation";
 import { ensureDefaultFormatsRegistered } from "@/lib/tournament/formats/registry-seed";
 
 ensureDefaultFormatsRegistered();
@@ -76,6 +77,13 @@ ensureDefaultFormatsRegistered();
                     </div>
 
                     <BuilderProgress client:load />
+
+                    <IslandErrorBoundary
+                        client:load
+                        title="Step navigation"
+                    >
+                        <StepNavigation client:load />
+                    </IslandErrorBoundary>
 
                     <div class="grid gap-5 lg:grid-cols-2">
                         <section
