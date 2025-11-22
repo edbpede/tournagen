@@ -86,7 +86,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - **Validates: Requirements 5.1, 5.2**
 
 - [ ] 6. Build tournament builder shell
-  - [ ] 6.1 Create builder page structure
+  - [x] 6.1 Create builder page structure
     - Create `builder.astro` with main layout
     - Add progress indicator for steps
     - Set up error boundary for islands

@@ -93,19 +93,20 @@ const matchArb = fc.record({
 describe("Property 15: export-import round trip", () => {
   getOrRegisterFormat(TournamentFormatType.SingleElimination);
 
+  const boundedDate = fc
+    .integer({
+      min: new Date("2020-01-01T00:00:00.000Z").getTime(),
+      max: new Date("2025-12-31T23:59:59.000Z").getTime(),
+    })
+    .map((value) => new Date(value));
+
   const configArb = fc
     .record({
       id: fc.uuid(),
       name: fc.string({ minLength: 1, maxLength: 40 }),
       participants: fc.array(participantArb, { minLength: 1, maxLength: 8 }),
-      createdAt: fc.date({
-        min: new Date("2020-01-01T00:00:00.000Z"),
-        max: new Date("2025-12-31T23:59:59.000Z"),
-      }),
-      updatedAt: fc.date({
-        min: new Date("2020-01-01T00:00:00.000Z"),
-        max: new Date("2025-12-31T23:59:59.000Z"),
-      }),
+      createdAt: boundedDate,
+      updatedAt: boundedDate,
       metadata: fc.dictionary(
         fc.string({ minLength: 1, maxLength: 12 }),
         fc.string({ maxLength: 32 }),
