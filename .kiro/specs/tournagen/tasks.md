@@ -63,7 +63,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 17.5_
 
 - [ ] 5. Implement import/export functionality
-  - [ ] 5.1 Create export utility
+  - [x] 5.1 Create export utility
     - Implement `exportTournament` function that serializes config to JSON
     - Trigger browser download with proper filename
     - Ensure human-readable JSON structure
