@@ -106,7 +106,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - _Requirements: 2.2_
 
 - [ ] 7. Build participant manager island
-  - [ ] 7.1 Create participant list component
+  - [x] 7.1 Create participant list component
     - Use `<For>` for participant rendering (not `.map()`)
     - Display participant name, seed, and optional fields
     - Apply fine-grained reactivity for individual updates

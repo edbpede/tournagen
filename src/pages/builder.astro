@@ -3,6 +3,7 @@ import "../styles/global.css";
 import BuilderProgress from "@components/builder/BuilderProgress";
 import FormatSelector from "@components/builder/FormatSelector";
 import IslandErrorBoundary from "@components/builder/IslandErrorBoundary";
+import ParticipantManager from "@components/builder/ParticipantManager";
 import PlaceholderPanel from "@components/builder/PlaceholderPanel";
 import StepNavigation from "@components/builder/StepNavigation";
 import { ensureDefaultFormatsRegistered } from "@/lib/tournament/formats/registry-seed";
@@ -169,10 +170,7 @@ ensureDefaultFormatsRegistered();
                                 client:idle
                                 title="Participant manager"
                             >
-                                <PlaceholderPanel
-                                    title="Participant manager island"
-                                    description="Add, edit, reorder, and enrich participants with seeds or metadata."
-                                />
+                                <ParticipantManager client:idle />
                             </IslandErrorBoundary>
                         </section>
 
