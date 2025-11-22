@@ -14,7 +14,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
   - _Requirements: 18.1, 18.3, 14.1, 14.2, 14.3_
 
 - [ ] 2. Implement core type system and interfaces
-  - [ ] 2.1 Create base tournament types and discriminated unions
+  - [x] 2.1 Create base tournament types and discriminated unions
     - Define `Participant`, `BaseTournamentConfig`, and `TournamentConfig` discriminated union
     - Define `TournamentFormatType` enum
     - Define `TournamentStructure` types (bracket, league, stage, racing)
