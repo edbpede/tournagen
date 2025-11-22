@@ -32,7 +32,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - _Requirements: 17.1, 17.5_
 
 - [ ] 3. Create global state management
-  - [ ] 3.1 Implement tournament state store
+  - [x] 3.1 Implement tournament state store
     - Create `TournamentState` interface with currentConfig, currentStructure, step, isDirty
     - Export global store using `createStore` (not `createSignal` - nested object)
     - Create derived memos for currentFormat and other computed values
