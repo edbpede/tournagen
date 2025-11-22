@@ -1,0 +1,115 @@
+---
+---
+
+<section
+    class="relative isolate overflow-hidden px-6 py-16 sm:py-24 lg:py-28"
+    aria-labelledby="hero-heading"
+>
+    <div class="pointer-events-none absolute -left-24 -top-32 h-72 w-72 rounded-full bg-brand-200/45 blur-3xl" />
+    <div class="pointer-events-none absolute right-[-6rem] top-8 h-80 w-80 rounded-full bg-accent-200/35 blur-3xl" />
+    <div class="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.05fr,0.95fr]">
+        <div class="space-y-7">
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="pill">Client-side only</span>
+                <span class="pill bg-white/95 text-neutral-700 border-neutral-200">
+                    No sign-ups required
+                </span>
+            </div>
+            <div class="space-y-4">
+                <h1
+                    id="hero-heading"
+                    class="font-display text-4xl sm:text-[2.75rem] leading-tight tracking-tight text-neutral-900"
+                >
+                    Design tournaments with clarity and ship them instantly.
+                </h1>
+                <p class="max-w-2xl text-lg text-neutral-700">
+                    Build brackets, leagues, and racing events entirely in the browser.
+                    TournaGen keeps everything local, renders progression lines for every format,
+                    and is ready to go offline after the first load.
+                </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                <a class="btn-primary px-5 py-3 text-base" href="/builder">
+                    Start building
+                </a>
+                <a class="btn-secondary px-5 py-3 text-base" href="#formats">
+                    Explore formats
+                </a>
+                <span class="text-sm text-neutral-600">
+                    Static by default · Visual progression built-in
+                </span>
+            </div>
+            <dl class="grid gap-3 sm:grid-cols-3">
+                <div class="card border-neutral-200/90 px-4 py-4">
+                    <dt class="text-sm text-neutral-600">Works anywhere</dt>
+                    <dd class="text-xl font-semibold text-neutral-900">Offline ready</dd>
+                </div>
+                <div class="card border-neutral-200/90 px-4 py-4">
+                    <dt class="text-sm text-neutral-600">Format coverage</dt>
+                    <dd class="text-xl font-semibold text-neutral-900">
+                        Brackets · Leagues · Racing
+                    </dd>
+                </div>
+                <div class="card border-neutral-200/90 px-4 py-4">
+                    <dt class="text-sm text-neutral-600">Export & share</dt>
+                    <dd class="text-xl font-semibold text-neutral-900">Readable JSON</dd>
+                </div>
+            </dl>
+        </div>
+        <div class="relative">
+            <div class="absolute inset-0 rounded-[28px] bg-gradient-to-br from-brand-50 via-surface-50 to-white blur-2xl" />
+            <div class="card relative border-brand-100 px-6 py-5 shadow-soft">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="pill">Single elimination</span>
+                        <span class="badge-accent">Visual progression</span>
+                    </div>
+                    <span class="text-sm font-medium text-neutral-600">Auto-bracketed</span>
+                </div>
+                <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                    <div class="bracket-match">
+                        <span class="text-sm text-neutral-500">Quarterfinal</span>
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-neutral-900">Seed 1</span>
+                            <span class="badge-accent">Advances</span>
+                        </div>
+                        <div class="bracket-connector" />
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-neutral-900">Seed 8</span>
+                            <span class="text-sm text-neutral-500">Awaiting</span>
+                        </div>
+                    </div>
+                    <div class="bracket-match">
+                        <span class="text-sm text-neutral-500">Quarterfinal</span>
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-neutral-900">Seed 4</span>
+                            <span class="badge-accent">Feeds into</span>
+                        </div>
+                        <div class="bracket-connector" />
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-neutral-900">Seed 5</span>
+                            <span class="text-sm text-neutral-500">Next round</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 rounded-lg border border-dashed border-brand-200 bg-brand-50/60 px-4 py-3">
+                    <p class="text-sm font-medium text-brand-800">
+                        Automatic connectors show how every match feeds forward — including byes.
+                    </p>
+                </div>
+                <div class="mt-4 grid gap-2 sm:grid-cols-2">
+                    <div class="rounded-lg border border-neutral-200 bg-white px-3 py-2 shadow-soft">
+                        <p class="text-sm text-neutral-600">Hydration</p>
+                        <p class="text-base font-semibold text-neutral-900">Static by default</p>
+                    </div>
+                    <div class="rounded-lg border border-neutral-200 bg-white px-3 py-2 shadow-soft">
+                        <p class="text-sm text-neutral-600">Control</p>
+                        <p class="text-base font-semibold text-neutral-900">
+                            Fine-grained updates
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

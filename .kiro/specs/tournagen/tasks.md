@@ -45,7 +45,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
 - [ ] 4. Build landing page
-  - [ ] 4.1 Create hero section component
+  - [x] 4.1 Create hero section component
     - Build static Astro component with heading, description, and CTA button
     - Apply design system styles using UnoCSS shortcuts
     - _Requirements: 1.1_
