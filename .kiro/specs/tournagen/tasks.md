@@ -50,7 +50,7 @@ This implementation plan breaks down the TournaGen application into discrete, ma
     - Apply design system styles using UnoCSS shortcuts
     - _Requirements: 1.1_
   
-  - [ ] 4.2 Create format card component
+- [x] 4.2 Create format card component
     - Build Astro component accepting format metadata as props
     - Display title, description, icon, and use cases
     - Apply card styles with hover effects
