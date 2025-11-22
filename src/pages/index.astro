@@ -1,16 +1,80 @@
 ---
-
+import "../styles/global.css";
 ---
 
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="generator" content={Astro.generator} />
+        <title>TournaGen</title>
+    </head>
+    <body class="surface font-sans">
+        <main class="min-h-screen flex items-center justify-center px-6 py-12">
+            <section class="card max-w-3xl w-full space-y-4">
+                <p class="pill w-fit">Design system foundation ready</p>
+                <div class="space-y-2">
+                    <h1
+                        class="text-3xl font-bold text-neutral-900 tracking-tight"
+                    >
+                        TournaGen
+                    </h1>
+                    <p class="text-neutral-700 text-base max-w-2xl">
+                        Modular tournament builder using Astro, SolidJS, and
+                        UnoCSS. Design tokens, typography, and shortcuts are
+                        configured to keep layouts cohesive.
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <button class="btn-primary">Primary Action</button>
+                    <button class="btn-secondary">Secondary</button>
+                    <button class="btn-ghost">Ghost</button>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <label class="field-group">
+                        <span class="input-label">Tournament name</span>
+                        <input class="input" placeholder="Summer Showdown" />
+                    </label>
+                    <label class="field-group">
+                        <span class="input-label">Format</span>
+                        <select class="input">
+                            <option>Single Elimination</option>
+                            <option>Double Elimination</option>
+                            <option>Round Robin</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <div class="bracket-match">
+                        <span class="text-sm text-neutral-500">Round 1</span>
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-neutral-900"
+                                >Player A</span
+                            >
+                            <span class="badge-accent">Seed 1</span>
+                        </div>
+                        <div class="bracket-connector"></div>
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-neutral-900"
+                                >Player B</span
+                            >
+                            <span class="pill">Seed 8</span>
+                        </div>
+                    </div>
+                    <div class="bracket-match" data-state="bye">
+                        <span class="text-sm text-neutral-500">Round 1</span>
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-neutral-900"
+                                >Player C</span
+                            >
+                            <span class="badge-accent">Seed 4</span>
+                        </div>
+                        <div class="bracket-connector"></div>
+                        <div class="text-neutral-600 text-sm">Bye advances</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </body>
 </html>
